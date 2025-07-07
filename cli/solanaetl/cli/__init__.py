@@ -24,6 +24,7 @@ from solanaetl.cli.extract_dex_trades import extract_dex_trades
 from solanaetl.cli.extract_field import extract_field
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 from solanaetl.cli.extract_tokens import extract_tokens
+from solanaetl.cli.run import run
 
 
 @click.group()
@@ -43,6 +44,9 @@ cli.add_command(extract_dex_trades, "extract_dex_trades")
 cli.add_command(extract_token_transfers, "extract_token_transfers")
 cli.add_command(extract_accounts, "extract_accounts")
 cli.add_command(extract_tokens, "extract_tokens")
+
+# streaming
+cli.add_command(run, "run")
 
 # utils
 cli.add_command(extract_field, "extract_field")
