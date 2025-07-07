@@ -25,6 +25,7 @@ import pendulum
 from airflow import DAG, configuration
 from airflow.operators import python_operator
 from solanaetl.cli import export_blocks_and_transactions, extract_accounts
+from solanaetl.cli.extract_dex_trades import extract_dex_trades
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 from solanaetl.cli.extract_tokens import extract_tokens
 
@@ -63,6 +64,7 @@ def build_export_dag(
 
     export_blocks_and_transactions_toggle = True
     extract_accounts_toggle = True
+    extract_dex_trades_toggle = True
     extract_token_transfers_toggle = True
     extract_tokens_toggle = True
 
@@ -165,6 +167,30 @@ def build_export_dag(
                 export_path('accounts', export_start_block, export_end_block)
             )
 
+    def extract_dex_trades_command(**kwargs):
+        with TemporaryDirectory() as tempdir:
+            copy_from_export_path(
+                export_path('instructions', export_start_block,
+                            export_end_block),
+                os.path.join(tempdir, 'instructions.csv')
+            )
+
+            logging.info('Calling extract_dex_trades({}, {}, {}, {}, ...)'.format(
+                export_start_block, export_end_block, export_batch_size, export_max_workers))
+
+            extract_dex_trades.callback(
+                instructions=os.path.join(tempdir, 'instructions.csv'),
+                batch_size=export_batch_size,
+                output=os.path.join(tempdir, 'dex_trades.csv'),
+                max_workers=export_max_workers,
+            )
+
+            copy_to_export_path(
+                os.path.join(tempdir, 'dex_trades.csv'),
+                export_path('dex_trades',
+                            export_start_block, export_end_block)
+            )
+
     def extract_token_transfers_command(**kwargs):
         with TemporaryDirectory() as tempdir:
             copy_from_export_path(
@@ -244,6 +270,13 @@ def build_export_dag(
         'extract_accounts',
         add_provider_uri_fallback_loop(
             extract_accounts_command, provider_uris),
+        dependencies=[export_blocks_and_transactions_operator]
+    )
+
+    extract_dex_trades_operator = add_task(
+        extract_dex_trades_toggle,
+        'extract_dex_trades',
+        extract_dex_trades_command,
         dependencies=[export_blocks_and_transactions_operator]
     )
 

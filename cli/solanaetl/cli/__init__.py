@@ -20,6 +20,7 @@ from solanaetl.cli.export_all import export_all
 from solanaetl.cli.export_blocks_and_transactions import export_blocks_and_transactions
 from solanaetl.cli.export_instructions import export_instructions
 from solanaetl.cli.extract_accounts import extract_accounts
+from solanaetl.cli.extract_dex_trades import extract_dex_trades
 from solanaetl.cli.extract_field import extract_field
 from solanaetl.cli.extract_token_transfers import extract_token_transfers
 from solanaetl.cli.extract_tokens import extract_tokens
@@ -38,6 +39,7 @@ cli.add_command(export_blocks_and_transactions, "export_blocks_and_transactions"
 cli.add_command(export_instructions, "export_instructions")
 
 # extract
+cli.add_command(extract_dex_trades, "extract_dex_trades")
 cli.add_command(extract_token_transfers, "extract_token_transfers")
 cli.add_command(extract_accounts, "extract_accounts")
 cli.add_command(extract_tokens, "extract_tokens")
