@@ -42,6 +42,7 @@ setup(
         "solana==0.25.0",
         "rlp==3.0.0",
         "requests",
+        "clickhouse-driver>=0.2.0",
     ],
     extras_require={
     },
